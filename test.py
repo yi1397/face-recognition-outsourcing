@@ -32,23 +32,32 @@ def face_encode_img(img):
     return encoding
 
 
-def face_distance(face_encodings, face_to_compare):
-    """
-    기존의 인코딩된 얼굴데이터들과 새로운 데이터를 비교한 값들을 리턴해줌
-    :param faces: encoding된 데이터 리스트, List (List in N * N * 3 np.array ) )
-    :param face_to_compare: 비교할 얼굴 데이터, float 자료형 np.array(길이:128)
-    :return: 비교된 결과, np.array
-    """
-    """
-    face_distance 사용법 
-        face_encodings에 들어온 데이터중 가장 비슷한 얼굴의 index는 리턴된 배열에서 가장 낮은 값을 가지는 값의 index와 같다.
-        0.35~0.5이하의 값을 가지면 동일인으로 볼 수 있다. (주의 : face_recognition 라이브러리의 compare_faces()은 
-        서양인 기준이라서 0.6으로 되어있어서 부정확 하기 때문에 for문으로 직접 찾아 줘야한다..)
-        """
-    if len(face_encodings) == 0:
-        return np.empty((0))
 
-    return np.linalg.norm(face_encodings - face_to_compare, axis=1)
+def add_new_id(encode_dict, name, encode_list):
+    """
+    encode 딕셔너리에 사용자를 추가
+    :param encode_dict: 딕셔너리나 리스트는 call by reference로 호출됨
+    :param name: 이름, string 자료형
+    :param encode_list: 딕셔너리나 리스트는 call by reference로 호출됨
+    :return: 없다
+    """
+    if encode_dict.get(name) is None:  # 동명이인이 없으면
+        encode_dict[name] = encode_list
+    else:  # 동명이인이 있음
+        pass  # 미구현
+
+
+def face_distance(encode, path, name):
+
+    if encode.get(name) is None:
+        return -1
+
+    compare_encode = face_encode_path(path)
+    distance = np.linalg.norm(encode[name] - compare_encode)
+    print('유사도(낮을수록 정확):', end='')
+    print(distance)
+    return distance
+
 
 def main():
     """
@@ -56,7 +65,7 @@ def main():
     """
 
     # encoding 시작
-    encode = {}  #
+    encode = {}
     for dir_path, dir_name, file_name in os.walk("./faces"):
         for f in file_name:
             if f.endswith(".jpg") or f.endswith(".png"):
@@ -65,20 +74,25 @@ def main():
                 encode[name] = encoding  # name을 key값으로 가지는 데이터
     # encoding 끝
 
-    # face recognition 시작
-    path = "./yuil.jpg"  # 찾을 이미지
-    face_to_compare = face_encode_path(path)
-    min_distance_name = "unknown"
-    min_distance = 0.5
-    for name in encode.keys():
-        distance = np.linalg.norm(encode[name] - face_to_compare)
-        print(name + '`s distance : ' + distance)
-        if distance < min_distance:
-            min_distance = distance;
-            min_distance_name = name
+    # 임의 사용자 추가 시작
+    add_name = '???'
+    add_path = "./add_test.jpg"
+    add_encode = face_encode_path(add_path)
+    add_new_id(encode, add_name, add_encode)
+    # 임의 사용자 추가 끝
 
-    print('\nname : ' + min_distance_name)
+    # face recognition 시작
+    test_name = 'yuil'
+    test_path = './yuil.jpg'
+    distance = face_distance(encode, test_path, test_name)
+    if distance is -1:
+        print('존재하지않는 사용자')
+    elif distance < 0.5:
+        print('통과')
+    else:
+        print('다른사람임')
     # face recognition 끝
+
 
 
 main()
