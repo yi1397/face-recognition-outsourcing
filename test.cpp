@@ -26,13 +26,17 @@ int main(int argc, char* argv[]) try
 
 	float distance = length(encode[0] - encode[1]);
 
+	std::cout << "distance: " << distance << std::endl;
+
 	if (distance < 0.5)
 	{
-		//동일한 인물
+		std::cout << "same person" << std::endl; 
+		return 1;
 	}
 	else
 	{
-		//동일하지 않은 인물
+		std::cout << "other person" << std::endl;
+		return -1;
 	}
 
 	return 0;

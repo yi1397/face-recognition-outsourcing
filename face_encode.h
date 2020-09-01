@@ -90,7 +90,7 @@ public:
         face_descriptors = net(faces);
         //cout << face_descriptors.size() << endl;
         //cout << trans(face_descriptors[0]) << endl;
-        cout << "encoding time : " << clock() - begin_t << "ms" << endl;
+        //cout << "encoding time : " << clock() - begin_t << "ms" << endl;
         cout << endl;
         return face_descriptors[0];
 
